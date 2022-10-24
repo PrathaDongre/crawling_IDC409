@@ -25,9 +25,13 @@ def create_workers():
 #above we created workers, now we need make them work
 #while true makes the worker run forever
 def work():
+    link_id = 0
     while True:
+        #send a number here, to crawl_page,
+        #there it adds the link to the queue. "link_id"
         url = queue.get()
-        Spider.crawl_page(threading.current_thread().name, url)
+        Spider.crawl_page(threading.current_thread().name, url, link_id)
+        link_id += 1
         queue.task_done()
 
 #each queued link is a new job

@@ -1,14 +1,24 @@
 import os
 import pandas as pd
+import metadata_parser
 
 #attempt to use pandas, adding the crawled and queued links to the dataframe and then getting its metadata.
-def create_project_df(file_name_crawled, file_name_queued):
-    print('creating dataframe with crawled and queued links ')
-    df = pd.DataFrame()
-    data_crawled = pd.read_csv(file_name_crawled)
-    data_queued = pd.read_csv(file_name_queued)
-    dataframe_links = pd.concat([data_queued,data_crawled])
-    return dataframe_links
+def create_project_df(file_name_queued):
+    print('creating dataframe with crawled links ')
+    data = {
+    'links':[],
+    'meta': []
+    }
+    df = pd.DataFrame(data)
+    list__of_links =[]
+    list__of_links = file_to_list(file_name_queued)
+    for i in range(len(list__of_links)):
+        if i%2 == 0:
+            df_links= list__of_links[i]
+            df_meta= list__of_links[i+1]
+            df.loc[len(df.index)] =  [df_links,df_meta]
+    #data_queued = pd.read_csv(file_name_queued, error_bad_lines=False)
+    return df
 
 #each website you crawl is a separate project (folder)
 def create_project_dir(directory):
@@ -36,7 +46,7 @@ create_data_files('wikicrawl','https://en.wikipedia.org/wiki/Adjacency_list')
 
 #add data onto an existing file
 def append_to_file(path,data):
-  with open (path, 'a',  encoding="utf-8") as file:
+  with open(path, 'a',  encoding="utf-8") as file:
     file.write(data+'\n')
 
 
@@ -62,5 +72,34 @@ def set_to_file(links,file):
   for link in sorted(links):
     append_to_file(file,link)
 
-dataframe_links = create_project_df('wikicrawl/crawled.txt', 'wikicrawl/queue.txt')
+#create new files called meta crawl and queue
+create_project_dir('wikicrawl_metalinks')
+create_data_files('wikicrawl_metalinks','https://en.wikipedia.org/wiki/Adjacency_list')
+
+#take links from wikicrawl/queue or crawled and append it
+#to new file called wikicrawl_metalinks/queue or crawled.
+'''with open('wikicrawl/queue.txt', "rt") as f1:
+    for url in f1:
+        page = metadata_parser.MetadataParser(url)
+        new_line  = str(url) +',' +str(page.metadata)
+        append_to_file('wikicrawl_metalinks/queue.txt',new_line)
+f.close()
+#adding both queued and crawled to the same link
+with open('wikicrawl/crawled.txt', "rt") as f2:
+    for url in f2:
+        page = metadata_parser.MetadataParser(url)
+        new_line  = url +',' +str(page.metadata)
+        append_to_file('wikicrawl_metalinks/queue.txt',new_line)
+f.close()'''
+
+#fn similar to file_to_set:
+def file_to_list(file_name):
+    results = list()
+    with open(file_name,'rt') as f:
+        for line in f:
+            results.append(line.replace('\n',''))
+    return results
+
+
+dataframe_links = create_project_df('wikicrawl_metalinks/queue.txt')
 dataframe_links.to_csv(r'D:\Users\Pratha S Dongre\Downloads\web_scraping\web_scraping_crawling_pratha\testproj\df_links.csv')
