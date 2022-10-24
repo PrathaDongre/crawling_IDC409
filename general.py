@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 import metadata_parser
+#import mysql
+import mysql.connector
+
 
 #attempt to use pandas, adding the crawled and queued links to the dataframe and then getting its metadata.
 def create_project_df(file_name_queued):
@@ -103,3 +106,12 @@ def file_to_list(file_name):
 
 dataframe_links = create_project_df('wikicrawl_metalinks/queue.txt')
 dataframe_links.to_csv(r'D:\Users\Pratha S Dongre\Downloads\web_scraping\web_scraping_crawling_pratha\testproj\df_links.csv')
+
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="255198"
+)
+
+print(mydb)
